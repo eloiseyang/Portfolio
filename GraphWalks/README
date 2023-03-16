@@ -1,0 +1,81 @@
+Problem Statement
+
+This CSV encodes a directed acyclic graph with three types of edges (A, B, or C)
+visualized in a PNG. The vertices have been assigned arbitrary numbers. A "walk"
+is defined as a contiguous sequence of head-to-tail edges in this graph.
+Implement a function in Python or C/C++ that finds the total number of walks
+(of any length) that begin with a type B edge and end with a type C edge.
+
+
+Solution Design
+
+I provided the function totalWalks in solution.py as my solution to this
+problem. I included the class Graph as part of my solution because I believe it
+makes my solution more readable and efficient. It also demonstrates the breadth
+of my skill as a programmer.
+
+The file solution.py was compiled using Python version 3.10.6 with only the
+native CSV input module as an import.
+
+The crux of my solution is a depth first search algorithm that returns each
+vertex in a graph in reverse topological order. As totalWalks visits a given
+vertex V, it adds the number of 'C' edges that are children of V to an
+accumulation list indexed by the unique given ID of V, hereafter V.id. Index
+V.id of this accumulation contains the number of possible paths leading to a 'C'
+edge from vertex V. For each child C connected to V the values of accumulation
+C.id are added to accumulation V.id. Each value in the accumulation represents
+possible paths and not the total number of unique 'C' edges in a child subgraph.
+An edge leading to a vertex represents a unique possible path stemming from its
+parent, so merely adding the result of an accumulation in reverse topological
+order in a directed acyclic graph is sufficient to count the number of paths to
+'C' from a given vertex. The final step is merely to associate the tail of each
+'B' edge T with its given value in the accumulation T.id, thereby solving the
+problem.
+
+This algorithm visits each vertex and each edge a single time, resulting in a
+linear O(V+E) complexity, where V is the number of vertices and E is the number
+of edges.
+
+
+Class Graph Design
+
+I first chose to use dictionary lookups for a map of graph G. Quickly
+identifying an edge by its head-tail pair is essential to this problem.
+Dictionary map lookup runs in O(1) time, whereas the the alternative list lookup
+runs in O(N) time where N is the number of edges. The problem does not define an
+expected order for its CSV files, so the order of edges and vertices does not
+matter, making dictionaries an ideal choice.
+
+Within the class Graph, I define properties containing sets of edges and
+vertices for the same reason. The user of Graph should not expect the values to
+be in any order at the time of construction. For ease of use I allow
+dictionary-like access to Graph by vertex ID, head-tail pairs, or by label.
+Index by vertex ID returns a vertex object, with properties parents and children
+listing them, index by head-tail pairs indifferent to order returns the associated
+label, and index by label returns a list of head-tail pairs for iteration. The
+iterator of Graph runs a depth first search to return each vertex in reverse
+topological order.
+
+I chose not to order the vertices and edges on initialization because it would
+introduce additional unexpected runtime. The point of initialization is to
+intake the data. The point of the iterator is to loop through the data, which
+is a costly process. I represent this concept in the structure of Graph.
+
+The Graph class is not intended to be feature complete, but has been written to
+solve this problem exclusively. That being said, I believe that it could be
+easily used to solve other problems on directed acyclic graphs, because
+topological ordering is generally a useful tool for acyclic graph type problems.
+Lastly, this code does not sanitize input and can only ingest data of the
+expected format.
+
+
+Conclusion
+
+I have explained my basic logic in designing my solution and its associated
+class. The main weakness of this implementation is its memory usage. Python
+dictionaries and sets both use hash tables that use additional memory to access
+data quickly. Lookup tables also can produce redundant information. For instance
+I implemented a dictionary of label keys as well as a dictionary of head-tail
+pair keys. The two way connection between key-value pairs is essential for
+the algorithm, but the duplication of data could be avoided with additional
+effort.
