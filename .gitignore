@@ -1,0 +1,10 @@
+### Emacs ###
+*~
+
+### Compilation ###
+solution.o
+
+### Test Bench ###
+test.py
+test.cpp
+test.h
